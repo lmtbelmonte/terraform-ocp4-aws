@@ -3,5 +3,3 @@ terraform.tfvars
 terraform.tfstate*
 kube*
 aws_config*
-openshift_pull_secret.json
-install
