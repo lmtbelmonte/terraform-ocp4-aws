@@ -64,7 +64,7 @@ EOF
 
 resource "null_resource" "aws_credentials" {
   triggers = {
-    random_number = "${data.aws_caller_identity.current.user_id} "
+    random_number = "${data.aws_caller_identity.current.user_id}"
   }
   provisioner "local-exec" {
     command = "mkdir -p ~/.aws"
@@ -109,7 +109,7 @@ platform:
   aws:
     region: ${var.aws_region}
 publish: ${var.aws_publish_strategy}
-pullSecret: '${var.openshift_pull_secret}'
+pullSecret: '${file(var.openshift_pull_secret)}'
 sshKey: '${tls_private_key.installkey.public_key_openssh}'
 %{if var.airgapped["enabled"]}imageContentSources:
 - mirrors:
@@ -494,6 +494,11 @@ resource "null_resource" "generate_ignition_config" {
 
   provisioner "local-exec" {
     command = "${path.module}/openshift-install --dir=${path.module}/temp create ignition-configs"
+  }
+
+# lmt: copy del tmp a un bucket de s3
+  provisioner "local-exec" {
+    command = "aws s3 cp ${path.module}/temp s3://ocp-44 --recursive"
   }
 }
 
